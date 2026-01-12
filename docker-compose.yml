@@ -1,0 +1,32 @@
+services:
+  mosquitto:
+    container_name: "${APP_ENV}.${APP_NAME}.mosquitto"
+    build: docker/
+    domainname: "mosquitto.${APP_NAME}.${APP_ENV}"
+    hostname: "mosquitto"
+    restart: always
+    ports:
+      - "${EXPOSE_PORT}:1883"
+    volumes:
+      - ./config:/mosquitto/config
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+    entrypoint: >
+      sh -c "mosquitto_passwd -c /mosquitto/config/password ${USER_LOGIN} ${USER_PASSWORD} &&
+             /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "256m"
+        max-file: "10"
+    networks:
+      default:
+        aliases:
+          - "${APP_ENV}.${APP_NAME}.mosquitto"
+
+networks:
+  default:
+    name: ${NETWORK}
+    external: true
