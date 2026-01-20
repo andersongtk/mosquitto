@@ -12,10 +12,10 @@ services:
       - ./data:/mosquitto/data
       - ./log:/mosquitto/log
     entrypoint: >
-      sh -c "mosquitto_passwd -c /mosquitto/config/password ${USER_LOGIN} ${USER_PASSWORD} &&
+      sh -c "mkdir -p /mosquitto/config &&
+             mosquitto_passwd -b -c /mosquitto/config/password ${USER_LOGIN} ${USER_PASSWORD} &&
+             chmod 644 /mosquitto/config/password &&
              /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
-    stdin_open: true
-    tty: true
     logging:
       driver: "json-file"
       options:
